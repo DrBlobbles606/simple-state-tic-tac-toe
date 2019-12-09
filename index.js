@@ -4,12 +4,14 @@ state({
 	dimension: INITIAL_DIMENSION,
 	degrees: 0,
 	blur: 0,
+	offset: 0,
 	board: Array(9).fill(-1)
 })
 
 let move = 0 // 0 : red, 1 : yellow
 let direction = 0
 let blurDirection = 0
+let offsetDirection = 0
 
 const resetGameWithMessage = message => {
 	alert(message)
@@ -57,19 +59,25 @@ const backgroundForCell = cell => {
 }
 
 setInterval(() => {
-	const { dimension, blur } = state
+	const { dimension, blur, offset } = state
 
 	dimension <= INITIAL_DIMENSION / 2 || dimension >= INITIAL_DIMENSION * 2
 		? direction ^= 1
 		: undefined
 
-	blur <= 0 || blur >= 20
+	blur <= 0 || blur >= 10
 		? blurDirection ^= 1
+		: undefined
+
+	offset <= -200 || offset >= 200
+		? offsetDirection ^= 1
 		: undefined
 
 	state('dimension', dimension + (direction || -1) * 10)
 	state('degrees', State.increment)
 	state('blur', blur + (blurDirection || -1))
+	state('offset', offset + (offsetDirection || -1) * 2)
+	console.log(state.offset)
 }, 1000 / 60)
 
 const oscillatingCircle = (id) =>
@@ -109,7 +117,8 @@ render(() => [
 			'align-content': 'center',
 			'justify-content': 'center',
 			transform: `rotate(${state.degrees}deg)`,
-			filter: `blur(${state.blur}px)`
+			filter: `blur(${state.blur}px)`,
+			'margin-left': `${state.offset}px`
 		})
 		.children([
 			threeOscillatingCircles(0),
